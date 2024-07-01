@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Header from "./Header";
+import Valid from "../utilits/Valid";
 
 const Login = () => {
   const [isSingup, setIsSingup] = useState(true);
+  const [err,setErr]=useState({})
+
+  const email=useRef(null)
+  const password=useRef(null)
   const handelevent = () => {
     setIsSingup(!isSingup);
   };
+  const handelform=()=>{
+   const msg= Valid(email.current.value,password.current.value)
+   console.log(msg)
+   setErr(msg)
+
+  }
 
   return (
     <div>
@@ -16,7 +27,7 @@ const Login = () => {
           alt="bg"
         />
       </div>
-      <form className=" p-[50px] w-3/12 absolute bg-black my-36 mx-auto right-0 left-0 text-white  rounded-xl bg-opacity-70">
+      <form onSubmit={(e)=>e.preventDefault()} className=" p-[50px] w-3/12 absolute bg-black my-36 mx-auto right-0 left-0 text-white  rounded-xl bg-opacity-70">
         <h3 className="font-bold text-xl py-4">{isSingup ? "singup" : "singin"}</h3>
         {isSingup ? (
           ""
@@ -39,15 +50,20 @@ const Login = () => {
           type="text"
           placeholder="email"
           className="w-full p-4 my-4 bg-gray-700"
+          ref={email}
         />
+        {err.email&&<p className="text-red-900">{err.email}</p>}
         <input
           type="password"
           placeholder="password"
           className="w-full p-4 my-4  bg-gray-700"
+          ref={password}
         />
-        <button className="w-full p-4 my-6 bg-red-700">
+         {err.password &&<p className="text-red-900">{err.password}</p>}
+        <button className="w-full p-4 my-6 bg-red-700" onClick={handelform}>
           {isSingup ? "singup" : "sing in"}
         </button>
+        
         <p className="p-4 my-4 cursor-pointer" onClick={handelevent}>
           {isSingup?"new to netflix? sing up now":"am allredy rigested"}
         </p>
