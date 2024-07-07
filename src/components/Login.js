@@ -1,22 +1,42 @@
 import React, { useRef, useState } from "react";
 import Header from "./Header";
 import Valid from "../utilits/Valid";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../utilits/fairebase';
 
 const Login = () => {
-  const [isSingup, setIsSingup] = useState(true);
-  const [err,setErr]=useState({})
+  const [isSignup, setIsSignup] = useState(true);
+  const [err, setErr] = useState({});
 
-  const email=useRef(null)
-  const password=useRef(null)
-  const handelevent = () => {
-    setIsSingup(!isSingup);
+  const email = useRef(null);
+  const password = useRef(null);
+
+  const handleEvent = () => {
+    setIsSignup(!isSignup);
   };
-  const handelform=()=>{
-   const msg= Valid(email.current.value,password.current.value)
-   console.log(msg)
-   setErr(msg)
 
-  }
+  const handleForm = async () => {
+    const msg = Valid(email.current.value, password.current.value);
+    console.log(msg);
+    setErr(msg);
+    if (msg) return;
+
+    if (!isSignup) {
+      createUserWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed up 
+    const user = userCredential.user;
+    
+    console.log(user)
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // ..
+  });
+    }
+  };
 
   return (
     <div>
@@ -27,45 +47,42 @@ const Login = () => {
           alt="bg"
         />
       </div>
-      <form onSubmit={(e)=>e.preventDefault()} className=" p-[50px] w-3/12 absolute bg-black my-36 mx-auto right-0 left-0 text-white  rounded-xl bg-opacity-70">
-        <h3 className="font-bold text-xl py-4">{isSingup ? "singup" : "singin"}</h3>
-        {isSingup ? (
-          ""
-        ) : (
+      <form onSubmit={(e) => e.preventDefault()} className="p-[50px] w-3/12 absolute bg-black my-36 mx-auto right-0 left-0 text-white rounded-xl bg-opacity-70">
+        <h3 className="font-bold text-3xl py-4 text-left">{isSignup ? "Signup" : "Signin"}</h3>
+        {!isSignup && (
           <>
-           <input
-            type="text"
-            placeholder="firstname"
-            className="w-full p-4 my-4 bg-gray-700"
-          />
-          <input
-          type="text"
-          placeholder="secondname"
-          className="w-full p-4 my-4 bg-gray-700"
-        />
+            <input
+              type="text"
+              placeholder="First Name"
+              className="w-full p-4 my-4 bg-gray-700"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              className="w-full p-4 my-4 bg-gray-700"
+            />
           </>
-         
         )}
         <input
           type="text"
-          placeholder="email"
+          placeholder="Email"
           className="w-full p-4 my-4 bg-gray-700"
           ref={email}
         />
-        {err.email&&<p className="text-red-900">{err.email}</p>}
+        {err.email && <p className="text-red-900 text-left">{err.email}</p>}
         <input
           type="password"
-          placeholder="password"
-          className="w-full p-4 my-4  bg-gray-700"
+          placeholder="Password"
+          className="w-full p-4 my-4 bg-gray-700 rounded-md"
           ref={password}
         />
-         {err.password &&<p className="text-red-900">{err.password}</p>}
-        <button className="w-full p-4 my-6 bg-red-700" onClick={handelform}>
-          {isSingup ? "singup" : "sing in"}
+        {err.password && <p className="text-red-900 text-left">{err.password}</p>}
+        <button className="w-full p-4 my-6 bg-red-700 rounded-md" onClick={handleForm}>
+          {isSignup ? "Signup" : "Sign In"}
         </button>
-        
-        <p className="p-4 my-4 cursor-pointer" onClick={handelevent}>
-          {isSingup?"new to netflix? sing up now":"am allredy rigested"}
+
+        <p className="p-4 my-4 cursor-pointer text-left" onClick={handleEvent}>
+          {isSignup ? "New to Netflix? Sign up now" : "Already registered? Sign in now"}
         </p>
       </form>
     </div>
